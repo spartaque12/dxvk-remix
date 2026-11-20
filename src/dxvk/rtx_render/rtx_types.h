@@ -345,6 +345,12 @@ struct RaytraceGeometry {
   Rc<DxvkBuffer> historyBuffer[2] = {nullptr};
   Rc<DxvkBuffer> indexCacheBuffer = nullptr;
 
+  // Fork (rtx_fork_wind.cpp): displaced positions of the Wind category ([0] this frame, [1] last frame), the rest
+  // positions they are computed from and the frame they were last written
+  Rc<DxvkBuffer> windBuffer[2] = {nullptr};
+  RaytraceBuffer windRestPositionBuffer;
+  uint32_t windFrame = UINT32_MAX;
+
   // Set to true after the smooth normals compute pass has been applied to this geometry.
   // Used to avoid redundant recomputation on subsequent frames for static geometry.
   bool smoothNormalsApplied = false;
@@ -654,6 +660,7 @@ enum class InstanceCategories : uint32_t {
   HairCards,
   DisableBackfaceCulling,
   CardNormals,
+  Wind,
 
   Count,
 };

@@ -52,6 +52,7 @@
 #include "rtx_light_utils.h"
 
 #include "../util/util_global_time.h"
+#include "rtx_fork_wind.h"
 #include "../util/util_struct_hash.h"
 
 #include "rtx/pass/particles/particle_system_common.h"
@@ -2381,6 +2382,10 @@ namespace dxvk {
         }
       }
     }
+
+    // NV-DXVK start: foliage wind, once the instances of the frame are known and before the buffer table is built
+    fork_hooks::windUpdate(*this, *ctx);
+    // NV-DXVK end
 
     m_graphManager.applySceneOverrides(ctx);
 

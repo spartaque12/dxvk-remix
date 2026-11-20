@@ -575,6 +575,8 @@ extern "C" {
     REMIXAPI_INSTANCE_CATEGORY_BIT_VIEW_MODEL                = 1 << 26,
     // 0.1000.6: shaded with a bent normal (card center to hit point, mixed with world up) instead of the vertex normals; for flat LOD card trees.
     REMIXAPI_INSTANCE_CATEGORY_BIT_CARD_NORMALS              = 1 << 27,
+    // fork: swayed by the foliage wind pass (rtx.wind.*)
+    REMIXAPI_INSTANCE_CATEGORY_BIT_WIND                      = 1 << 28,
   } remixapi_InstanceCategoryBit;
 
   typedef uint32_t remixapi_InstanceCategoryFlags;

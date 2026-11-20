@@ -77,6 +77,7 @@
 #include "rtx_render/rtx_point_instancer_system.h"
 #include "rtx_render/rtx_overlay_window.h"
 #include "rtx_render/rtx_fork_hooks.h"
+#include "rtx_render/rtx_fork_wind.h"
 // NV-DXVK start: Numos native weather UI
 #include "rtx_render/rtx_weather.h"
 // NV-DXVK end
@@ -208,7 +209,8 @@ namespace dxvk {
     {"particleemittertextures","Particle Emitters (optional)", &RtxOptions::particleEmitterTexturesObject()},
     {"smoothnormalstextures","Smooth Normals (optional)", &RtxOptions::smoothNormalsTexturesObject()},
     {"disablebackfacecullingtextures","Disable Backface Culling (optional)", &RtxOptions::disableBackfacecullingTexturesObject()},
-    {"cardnormalstextures","Card Normals (optional)", &RtxOptions::cardNormalsTexturesObject()}
+    {"cardnormalstextures","Card Normals (optional)", &RtxOptions::cardNormalsTexturesObject()},
+    {"windtextures","Wind (optional)", &RtxOptions::windTexturesObject()}
   };
 
   RemixGui::ComboWithKey<RenderPassGBufferRaytraceMode> renderPassGBufferRaytraceModeCombo {
@@ -2934,6 +2936,12 @@ namespace dxvk {
       if (RemixGui::CollapsingHeader("LOD Cross Fade", collapsingHeaderClosedFlags)) {
         ImGui::Indent();
         fork_hooks::showLodFadeSettings();
+        ImGui::Unindent();
+      }
+
+      if (RemixGui::CollapsingHeader("Foliage Wind", collapsingHeaderClosedFlags)) {
+        ImGui::Indent();
+        fork_hooks::showWindSettings();
         ImGui::Unindent();
       }
 

@@ -405,6 +405,7 @@ namespace fork_hooks {
       applyCategory(RtxOptions::hairCardTextures(), InstanceCategories::HairCards);
       applyCategory(RtxOptions::disableBackfacecullingTextures(), InstanceCategories::DisableBackfaceCulling);
       applyCategory(RtxOptions::cardNormalsTextures(), InstanceCategories::CardNormals);
+      applyCategory(RtxOptions::windTextures(), InstanceCategories::Wind);
     }
   }
 

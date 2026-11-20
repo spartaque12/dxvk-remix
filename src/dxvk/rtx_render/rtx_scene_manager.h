@@ -131,6 +131,7 @@ namespace fork_hooks {
                                const std::shared_ptr<const std::vector<RasterGeometry>>& submeshes,
                                ReplacementInstance& replacementInstance);
   struct RetainedSceneAccess;
+  struct WindSceneAccess;
 }
 
 // Scene manager is a super manager, it's the interface between rendering and world state
@@ -155,6 +156,8 @@ class SceneManager : public CommonDeviceObject, public ResourceCache {
   // Fork touchpoint: the keep-alive of pinned retained instances (rtx_fork_retained.cpp) needs
   // preserveInstance, m_instanceManager, m_drawCallTracker and m_textureCacheGenerationValidForPreserve.
   friend struct fork_hooks::RetainedSceneAccess;
+  // Fork touchpoint: the foliage wind pass (rtx_fork_wind.cpp) needs m_drawCallCache, updateBufferCache and m_instanceManager.
+  friend struct fork_hooks::WindSceneAccess;
 
 public:
   SceneManager(SceneManager const&) = delete;

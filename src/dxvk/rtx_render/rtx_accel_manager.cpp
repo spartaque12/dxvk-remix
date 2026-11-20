@@ -741,7 +741,8 @@ namespace dxvk {
 
       // NV-DXVK start: a small mesh whose geometry changes every frame would dirty and rebuild its whole merged bucket every frame
       const bool animatedEveryFrame = fork_hooks::keepAnimatedMeshesOutOfMergedBlas() &&
-                                      (blasEntry->input.getSkinningState().numBones != 0 || blasEntry->input.usesVertexShader);
+                                      (blasEntry->input.getSkinningState().numBones != 0 || blasEntry->input.usesVertexShader ||
+                                       blasEntry->modifiedGeometryData.windBuffer[0] != nullptr); // fork: swayed by the wind pass
       // NV-DXVK end
       const bool forceMergedBlas = (blasEntry->buildGeometries.size() > 1 ||                                       // Currently we use multiple build geometries for particle billboards, which we prefer to merge into large BLAS
                                     (!RtxOptions::minimizeBlasMerging() && blasPrims < minPrimsInDynamicBLAS && !animatedEveryFrame) ||   // Avoid creating lots of small dynamic BLAS

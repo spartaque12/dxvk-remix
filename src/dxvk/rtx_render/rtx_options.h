@@ -334,6 +334,9 @@ namespace dxvk {
     RTX_OPTION("rtx", fast_unordered_set, cardNormalsTextures, {},
                   "Objects rendered with these textures are shaded with a bent normal instead of their vertex normals: per hit, the direction from the card's center (the midpoint of the triangle's longest edge) to the hit point, mixed with world up by rtx.cardNormals.upWeight.\n"
                   "Meant for flat LOD trees made of crossed cards, which otherwise shade as two flat planes (one lit, one black). The normal lies in the card plane, so both sides of a card shade the same.");
+    RTX_OPTION("rtx", fast_unordered_set, windTextures, {},
+                  "Objects rendered with these textures sway in the wind (rtx.wind.*): the vertices are displaced on the GPU every frame, higher up more than at the base.\n"
+                  "Mesh replacements inherit the category of the draw they replace, so the leaf texture of a tree flags the whole replacement tree.");
 
   public:
     RTX_OPTION("rtx", bool, showRaytracingOption, true, "Enables or disables the option to toggle ray tracing in the UI. When set to false the ray tracing checkbox will not appear in the Remix UI.");

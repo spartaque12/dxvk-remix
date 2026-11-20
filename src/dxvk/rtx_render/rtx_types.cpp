@@ -414,6 +414,7 @@ namespace dxvk {
     setCategory(InstanceCategories::HairCards, lookupHash(RtxOptions::hairCardTextures(), textureHash));
     setCategory(InstanceCategories::DisableBackfaceCulling, lookupHash(RtxOptions::disableBackfacecullingTextures(), textureHash));
     setCategory(InstanceCategories::CardNormals, lookupHash(RtxOptions::cardNormalsTextures(), textureHash));
+    setCategory(InstanceCategories::Wind, lookupHash(RtxOptions::windTextures(), textureHash));
   }
 
   void DrawCallState::setupCategoriesForGeometry() {

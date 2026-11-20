@@ -58,6 +58,7 @@ namespace dxvk {
     { "remix_category:hair_cards",                "Hair Cards",                "rtx.hairCardTextures" },
     { "remix_category:disable_backface_culling",  "Disable Backface Culling",  "rtx.disableBackfacecullingTextures" },
     { "remix_category:card_normals",              "Card Normals",              "rtx.cardNormalsTextures" },
+    { "remix_category:wind",                      "Wind",                      "rtx.windTextures" },
   };
   // NV-DXVK end
 }
