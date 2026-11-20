@@ -88,13 +88,13 @@ namespace dxvk {
     RemixGui::Checkbox("Enable Foliage Wind", &enableObject());
     if (enable()) {
       ImGui::Indent();
-      RemixGui::DragFloat("Strength", &strengthObject(), 0.005f, 0.f, 2.f, "%.3f");
+      RemixGui::DragFloat("Strength", &strengthObject(), 0.001f, 0.f, 0.3f, "%.3f");
       RemixGui::DragFloat("Speed", &speedObject(), 0.01f, 0.f, 10.f, "%.2f");
       RemixGui::DragFloat("Gust Frequency", &gustFrequencyObject(), 0.01f, 0.f, 5.f, "%.2f");
       RemixGui::SliderFloat2("Direction", &directionObject(), -1.f, 1.f, "%.2f");
       RemixGui::DragFloat("Leaf Flutter", &flutterObject(), 0.001f, 0.f, 0.2f, "%.3f");
-      RemixGui::DragFloat("Height Start", &heightStartObject(), 0.05f, -5.f, 20.f, "%.2f");
-      RemixGui::DragFloat("Height Range", &heightRangeObject(), 0.05f, 0.1f, 40.f, "%.2f");
+      RemixGui::SliderFloat("Height Start", &heightStartObject(), 0.f, 1.f, "%.2f");
+      RemixGui::SliderFloat("Height Range", &heightRangeObject(), 0.01f, 1.f, "%.2f");
       RemixGui::DragFloat("Max Distance", &maxDistanceObject(), 1.f, 1.f, 1000.f, "%.0f");
       ImGui::Unindent();
     }
@@ -189,14 +189,39 @@ namespace fork_hooks {
       // the tree's root space: the replacement's transform to the object it replaces (game mesh space, z up, origin at
       // the base of the tree), identity for non-replacement meshes
       Matrix4 meshToRoot;
+      // height span of the whole model in root space: the union of all its meshes, so bark and leaves bend alike
+      float zMin = FLT_MAX, zMax = -FLT_MAX;
+      auto addBox = [&](const AxisAlignedBoundingBox& box, const Matrix4& toRoot) {
+        if (!box.isValid()) {
+          return;
+        }
+        for (uint32_t c = 0; c < 8; c++) {
+          const Vector3 corner((c & 1) ? box.maxPos.x : box.minPos.x, (c & 2) ? box.maxPos.y : box.minPos.y, (c & 4) ? box.maxPos.z : box.minPos.z);
+          const float z = (toRoot * Vector4(corner, 1.f)).z;
+          zMin = std::min(zMin, z);
+          zMax = std::max(zMax, z);
+        }
+      };
       {
         auto& owner = nearest->getPrimInstanceOwner();
         const ReplacementInstance* ri = owner.getReplacementInstance();
         const size_t index = owner.getReplacementIndex();
         if (ri != nullptr && ri->activeReplacements != nullptr && index < ri->activeReplacements->replacements.size()) {
           meshToRoot = ri->activeReplacements->replacements[index].replacementToObject;
+          for (const AssetReplacement& r : ri->activeReplacements->replacements) {
+            if (r.type == AssetReplacement::eMesh && r.geometry) {
+              addBox(r.geometry->data.boundingBox, r.replacementToObject);
+            }
+          }
         }
       }
+      if (zMin > zMax) {
+        addBox(blas.input.getGeometryData().boundingBox, meshToRoot); // game mesh, or bounds not known yet
+      }
+      if (zMin > zMax) {
+        continue;
+      }
+      const float height = std::max(zMax - zMin, 0.05f);
       const Matrix4 rootToMesh = inverse(meshToRoot);
 
       const RaytraceBuffer& rest = geo.windRestPositionBuffer;
@@ -209,13 +234,13 @@ namespace fork_hooks {
       const float dirLength = std::sqrt(dir.x * dir.x + dir.y * dir.y);
       args.direction = dirLength > 1e-4f ? vec2(dir.x / dirLength, dir.y / dirLength) : vec2(1.f, 0.f);
       args.time = time;
-      args.strength = WindOptions::strength() * fade;
+      args.strength = WindOptions::strength() * height * fade; // a bush bends as much as a tree, relative to its size
       args.speed = WindOptions::speed();
       args.gustFrequency = WindOptions::gustFrequency();
       args.flutter = nearest->isOpaque() ? 0.f : WindOptions::flutter() * fade;
       args.meshPhase = float(hash & 0xFFFFu) / 65535.f * 6.2831853f;
-      args.heightStart = WindOptions::heightStart();
-      args.invHeightRange = 1.f / std::max(WindOptions::heightRange(), 0.01f);
+      args.heightStart = zMin + WindOptions::heightStart() * height;
+      args.invHeightRange = 1.f / (std::max(WindOptions::heightRange(), 0.01f) * height);
       args.srcOffset = uint32_t((rest.offset() + rest.offsetFromSlice()) / 4u);
       args.srcStride = rest.stride() / 4u;
       args.numVertices = geo.vertexCount;
